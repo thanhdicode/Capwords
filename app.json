@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "CapWords Study",
+    "slug": "capwords-clone",
+    "version": "0.2.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.study.capwordsclone"
+    },
+    "android": {
+      "package": "dev.study.capwordsclone",
+      "predictiveBackGestureEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow CapWords Study to capture objects for your personal vocabulary.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose a photo to add to your personal vocabulary.",
+          "cameraPermission": "Capture a photo for your vocabulary.",
+          "microphonePermission": false
+        }
+      ],
+      "expo-asset",
+      "expo-video",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": false,
+          "savePhotosPermission": "Allow CapWords Study to save word images to Photos.",
+          "granularPermissions": ["photo"]
+        }
+      ],
+      "expo-sharing",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow CapWords Study to record a temporary pronunciation attempt while you hold the microphone. Recordings stay on this device and are not automatically scored.",
+          "recordAudioAndroid": true,
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
+        }
+      ]
+    ]
+  }
+}

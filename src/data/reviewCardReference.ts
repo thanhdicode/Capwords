@@ -1,0 +1,80 @@
+/** Visible source values for static Review captures; queue words remain app-state data. */
+export const reviewCardReference = {
+  "021": { progressTotal: 5 },
+  "042": { progressTotal: 5 },
+  "058": {
+    progressCurrent: 0,
+    progressTotal: 5,
+    targetWord: "Un cornet de glace",
+    cardAccessibilityPrefix: "Review needs-review card",
+  },
+  "068": {
+    progressCurrent: 0,
+    progressTotal: 5,
+    targetWord: "Un cornet de glace",
+    cardAccessibilityPrefix: "Review tap-details card",
+    cueLabel: "Tap for details",
+  },
+  "081": {
+    progressCurrent: 0,
+    progressTotal: 4,
+    targetWord: "Un cornet de glace",
+    capturedTargetLabel: "Cornet\nde glace",
+    capturedPhoneticLabel: "/kɔʁ.nɛ də ɡlas/",
+    cardAccessibilityPrefix: "Review card",
+    hintLabel: "Say the word out loud",
+  },
+  "087": {
+    progressCurrent: 1,
+    progressTotal: 4,
+    targetWord: "Tournesol",
+    capturedTargetLabel: "Tournesol",
+    cardAccessibilityPrefix: "Review card",
+  },
+  "089": {
+    progressCurrent: 2,
+    progressTotal: 4,
+    targetWord: "Tournesol",
+    capturedTargetLabel: "Tournesol",
+    cardAccessibilityPrefix: "Review retry feedback card",
+    feedbackTitle: "You're putting in effort,let's try again!",
+    feedbackBodyPrefix: "Tap",
+    feedbackBodySuffix: "to hear the ideal speed",
+    feedbackPlaybackLabel: "Play ideal-speed pronunciation",
+  },
+  "092": {
+    progressCurrent: 2,
+    progressTotal: 4,
+    targetWord: "Tournesol",
+    cardAccessibilityPrefix: "Review feedback card",
+    skipLabel: "Skip for now",
+    encouragementIcon: "💪",
+    encouragementTitle: "You've got this!",
+    encouragementBody:
+      "Take your time, this word will stay in your practice list",
+  },
+  "094": {
+    progressCurrent: 2,
+    progressTotal: 4,
+    targetWord: "Tournesol",
+    cardAccessibilityPrefix: "Review card",
+    skipLabel: "Skip for now",
+  },
+  "096": {
+    progressCurrent: 2,
+    progressTotal: 4,
+    targetWord: "Tournesol",
+    nextTargetWord: "Une Femme",
+    cardAccessibilityPrefix: "Review transition card",
+    nextCardAccessibilityPrefix: "Next review card",
+  },
+  "098": {
+    progressCurrent: 3,
+    progressTotal: 4,
+    targetWord: "Une Femme",
+    capturedTargetLabel: "Une femme",
+    cardAccessibilityPrefix: "Review card",
+  },
+} as const;
+
+export type ReviewCardSourceId = keyof typeof reviewCardReference;

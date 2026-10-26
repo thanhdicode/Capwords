@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "capwords-recognition-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-25",
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "ai": { "binding": "AI" },
+  "d1_databases": [{
+    "binding": "USAGE",
+    "database_name": "capwords-usage",
+    "database_id": "<replace-with-your-D1-database-id>"
+  }],
+  "vars": {
+    "APPWRITE_ENDPOINT": "https://<your-appwrite-region>.cloud.appwrite.io/v1",
+    "APPWRITE_PROJECT_ID": "<your-appwrite-project-id>",
+    "ALLOWED_ORIGINS": "https://your-app.example,http://localhost:8084,http://localhost:8081"
+  }
+}

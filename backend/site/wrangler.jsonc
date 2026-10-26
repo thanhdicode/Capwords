@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "capwords-study",
+  "compatibility_date": "2026-10-25",
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "assets": {
+    "directory": "../../dist-live",
+    "not_found_handling": "single-page-application"
+  }
+}

@@ -1,0 +1,18 @@
+export const cropEditorCopy = {
+  instruction: "Zoom or move the image to place\nthe object within the frame",
+  confirmSelection: "✓ Confirm selection",
+  preparing: "Preparing…",
+  cancel: "Cancel",
+  zoomOut: "Zoom out",
+  zoomIn: "Zoom in",
+  zoomMultiplierSuffix: "×",
+  rotateLeft: "Rotate left",
+  resetCrop: "Reset crop",
+  selectRatio: "Select image ratio",
+  rotateRight: "Rotate right",
+  currentRatioHint: (ratio: string) => `Current image ratio: ${ratio}.`,
+  imageLoadError: "The selected image could not be loaded.",
+  transformError: "This image could not be transformed.",
+  cropError: "This image could not be cropped. Try resetting the image.",
+  dismissError: "OK",
+} as const;

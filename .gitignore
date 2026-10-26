@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+
+# Expo and generated builds
+.expo/
+expo-env.d.ts
+/dist/
+/dist-*/
+/web-build/
+/.next/
+
+# Native build output and signing material
+.kotlin/
+/ios/
+/android/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+
+# Metro and package-manager debug output
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# Local environment and provider credentials
+.env
+.env.*
+!.env.example
+.dev.vars*
+!.dev.vars.example
+.wrangler/
+.provider-secrets/
+
+# TypeScript and Python caches
+*.tsbuildinfo
+__pycache__/
+*.py[cod]
+
+# Local/deployment-specific config and scratch files
+/appwrite.config.json
+/backend/live_smoke.py
+*.tmp
+.manus-*
+
+# Research captures, generated QA output, and local results
+/research/
+/qa/
+/test-results/
+/public/references/
+/video_*_analysis_*.md
+
+# Workspace-only instructions and planning notes
+/AGENTS.md
+/AUTOMATION_BRIEF.md
+/NEXT.md
+
+# OS/editor files
+.DS_Store
