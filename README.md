@@ -1,8 +1,8 @@
-# CapWords Study
+# Independent Vocabulary-Learning Study
 
-CapWords Study is an experimental vocabulary-learning app built with Expo, React Native, and TypeScript. It explores a camera-first way to collect words, practice pronunciation, and review vocabulary over time.
+This experimental vocabulary-learning app is an independent academic study built with Expo, React Native, and TypeScript. It explores a camera-first way to collect words, practice pronunciation, and review vocabulary over time.
 
-> **Project status:** research prototype. It is not an official CapWords app, is not affiliated with the referenced product, and is not production-ready. Some screens and visual assets were recreated or adapted for a study project; see [Asset and brand rights](#asset-and-brand-rights).
+> **Project status:** research prototype only, not production-ready. This project is not an official CapWords app and is not affiliated with or endorsed by CapWords or its operators. Some prototype screens and visual assets are reference-derived; see [Asset and brand rights](#asset-and-brand-rights).
 
 ## Highlights
 
@@ -99,4 +99,4 @@ The project source code is licensed under the [MIT License](LICENSE), subject to
 
 ### Asset and brand rights
 
-The MIT license applies to project-authored source code only. It does not grant rights to third-party names, trademarks, photographs, fonts, or visual assets. Some files in `assets/` are study/prototype materials with separate or unverified provenance; they are included only as app runtime resources, and their inclusion does not imply permission to reuse or redistribute them. Verify the rights for each such file before reuse. The product name and marks belong to their respective owners. This project is an independent study and is not endorsed by or affiliated with them.
+The MIT license applies to project-authored source code only. It does not grant rights to third-party names, trademarks, photographs, fonts, or visual assets. The repository includes study/prototype and reference-derived assets whose provenance or redistribution rights have not been independently verified. Do not reuse or redistribute those assets without confirming rights with the relevant owners. The CapWords name and marks belong to their respective owners; this independent academic study is not affiliated with or endorsed by them.

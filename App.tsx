@@ -12,6 +12,8 @@ import {
 import { Nunito_900Black } from "@expo-google-fonts/nunito";
 import * as Speech from "expo-speech";
 import { captureReferenceTimestamps } from "./src/data/captureReference";
+import { APP_STATE_SNAPSHOT_VERSION } from "./src/data/repositories/localAppStateRepository";
+import { UnsupportedSnapshotRecoveryScreen } from "./src/screens/UnsupportedSnapshotRecoveryScreen";
 import { AppProvider, useApp } from "./src/state/AppContext";
 import {
   CloudAccountProvider,
@@ -121,6 +123,13 @@ function NavigatorLoading() {
 function Navigator() {
   const app = useApp();
   if (!app.ready) return <NavigatorLoading />;
+  if (app.unsupportedSnapshotVersion !== null)
+    return (
+      <UnsupportedSnapshotRecoveryScreen
+        storedVersion={app.unsupportedSnapshotVersion}
+        supportedVersion={APP_STATE_SNAPSHOT_VERSION}
+      />
+    );
   return <NavigatorContent />;
 }
 

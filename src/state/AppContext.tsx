@@ -9,13 +9,13 @@ import React, {
   useState,
 } from "react";
 import { DEMO_VOCABULARY } from "../data/demoVocabulary";
-import { mergeRestoredLibrary } from "../domain/cloudRestore";
 import {
-  DEFAULT_REMINDER_SETTINGS,
-  isValidPreferredSpeechVoiceId,
-  isValidReminderTime,
-  migrateReminderSettings,
-} from "../domain/profileSettings";
+  createLocalAppStateRepository,
+  type LocalAppStateLoadResult,
+} from "../data/repositories/localAppStateRepository";
+import { isValidAppState } from "../domain/appStateValidation";
+import { mergeRestoredLibrary } from "../domain/cloudRestore";
+import { DEFAULT_REMINDER_SETTINGS } from "../domain/profileSettings";
 import {
   createWord,
   removeWord,
@@ -24,7 +24,6 @@ import {
 } from "../domain/vocabulary";
 import {
   createReviewSummary,
-  isValidReviewSummary,
   rateWord as applyRating,
   reviewDateKey,
 } from "../domain/review";
@@ -37,12 +36,10 @@ import type {
   NewWord,
   ReviewRating,
   ReviewSummary,
-  Word,
   WordPatch,
 } from "../domain/types";
 
-const STORAGE_KEY = "@capwords/state";
-const STORAGE_VERSION = 1;
+const appStateRepository = createLocalAppStateRepository(AsyncStorage);
 
 type ConfigState = Omit<AppState, "words" | "reviewDates">;
 export type AppSettingsPatch = Partial<ConfigState>;
@@ -61,14 +58,10 @@ export const initialState: AppState = {
   lastReview: null,
 };
 
-interface PersistedState {
-  version: number;
-  state: AppState;
-}
-
 export interface AppContextValue {
   state: AppState;
   ready: boolean;
+  unsupportedSnapshotVersion: number | null;
   completeOnboarding: (
     nativeLanguage: string,
     learningLanguage: string,
@@ -89,140 +82,38 @@ export interface AppContextValue {
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
 
-function isValidDateString(value: unknown): value is string {
-  return (
-    typeof value === "string" &&
-    value.length > 0 &&
-    Number.isFinite(new Date(value).getTime())
-  );
-}
-
-function isValidWord(value: unknown): value is Word {
-  if (!value || typeof value !== "object") return false;
-  const word = value as Partial<Word>;
-  const review = word.review;
-  return (
-    typeof word.id === "string" &&
-    word.id.length > 0 &&
-    typeof word.native === "string" &&
-    typeof word.target === "string" &&
-    typeof word.phonetic === "string" &&
-    typeof word.example === "string" &&
-    typeof word.exampleTranslation === "string" &&
-    typeof word.emoji === "string" &&
-    typeof word.color === "string" &&
-    typeof word.category === "string" &&
-    typeof word.favorite === "boolean" &&
-    isValidDateString(word.createdAt) &&
-    typeof review === "object" &&
-    review !== null &&
-    isValidDateString(review.dueAt) &&
-    Number.isInteger(review.intervalDays) &&
-    review.intervalDays >= 0 &&
-    Number.isInteger(review.repetitions) &&
-    review.repetitions >= 0 &&
-    (word.imageUri === undefined || typeof word.imageUri === "string")
-  );
-}
-
-function isValidState(value: unknown): value is AppState {
-  if (!value || typeof value !== "object") return false;
-  const state = value as Partial<AppState>;
-  return (
-    typeof state.onboarded === "boolean" &&
-    typeof state.nativeLanguage === "string" &&
-    typeof state.learningLanguage === "string" &&
-    isValidPreferredSpeechVoiceId(state.preferredSpeechVoiceId) &&
-    typeof state.profileName === "string" &&
-    (state.profileAvatarUri === undefined ||
-      typeof state.profileAvatarUri === "string") &&
-    typeof state.dailyGoal === "number" &&
-    Number.isFinite(state.dailyGoal) &&
-    Number.isInteger(state.dailyGoal) &&
-    state.dailyGoal >= 0 &&
-    typeof state.dailyReminderEnabled === "boolean" &&
-    isValidReminderTime(state.dailyReminderTime) &&
-    typeof state.reviewRemindersEnabled === "boolean" &&
-    typeof state.sound === "boolean" &&
-    Array.isArray(state.words) &&
-    state.words.every(isValidWord) &&
-    Array.isArray(state.reviewDates) &&
-    state.reviewDates.every(
-      (date) =>
-        /^\d{4}-\d{2}-\d{2}$/.test(date) &&
-        isValidDateString(`${date}T00:00:00`),
-    ) &&
-    (state.lastReview === undefined ||
-      state.lastReview === null ||
-      isValidReviewSummary(state.lastReview))
-  );
-}
-
-function parsePersisted(raw: string | null): AppState | null {
-  if (!raw) return null;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return null;
-    const persisted = parsed as Partial<PersistedState>;
-    if (
-      persisted.version !== STORAGE_VERSION ||
-      !persisted.state ||
-      typeof persisted.state !== "object"
-    )
-      return null;
-
-    // Older v1 saves have no summary. Invalid summary-only data is discarded
-    // without rejecting otherwise valid user words/settings.
-    const sourceState = persisted.state as unknown as Record<string, unknown>;
-    const currentFields = { ...sourceState };
-    delete currentFields.reminders;
-    const migrated = {
-      ...currentFields,
-      ...migrateReminderSettings(sourceState),
-      preferredSpeechVoiceId: isValidPreferredSpeechVoiceId(
-        sourceState.preferredSpeechVoiceId,
-      )
-        ? sourceState.preferredSpeechVoiceId
-        : null,
-      profileAvatarUri:
-        typeof sourceState.profileAvatarUri === "string"
-          ? sourceState.profileAvatarUri
-          : undefined,
-      lastReview: isValidReviewSummary(sourceState.lastReview)
-        ? sourceState.lastReview
-        : null,
-    };
-    return isValidState(migrated) ? migrated : null;
-  } catch {
-    return null;
-  }
-}
-
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppState>(initialState);
   const stateRef = useRef<AppState>(initialState);
   const [ready, setReady] = useState(false);
+  const [unsupportedSnapshotVersion, setUnsupportedSnapshotVersion] = useState<
+    number | null
+  >(null);
+  const unsupportedSnapshotRef = useRef(false);
   const mutatedBeforeHydration = useRef(false);
   const writeQueue = useRef(Promise.resolve());
 
   const persistSnapshot = useCallback((snapshot: AppState) => {
-    const payload: PersistedState = {
-      version: STORAGE_VERSION,
-      state: snapshot,
-    };
     const write = writeQueue.current
       .catch(() => undefined)
-      .then(() => AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)));
+      .then(() => appStateRepository.save(snapshot));
     writeQueue.current = write.catch(() => undefined);
     return write;
   }, []);
 
   useEffect(() => {
     let mounted = true;
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then((raw) => {
+    appStateRepository
+      .loadResult()
+      .then((result: LocalAppStateLoadResult) => {
+        if (result.status === "unsupported-version") {
+          unsupportedSnapshotRef.current = true;
+          if (mounted) setUnsupportedSnapshotVersion(result.version);
+          return;
+        }
         if (mounted && !mutatedBeforeHydration.current) {
-          const restored = parsePersisted(raw) ?? initialState;
+          const restored =
+            result.status === "loaded" ? result.state : initialState;
           stateRef.current = restored;
           setState(restored);
         }
@@ -242,9 +133,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || unsupportedSnapshotRef.current) return;
     void persistSnapshot(state).catch(() => undefined);
-  }, [ready, state, persistSnapshot]);
+  }, [ready, state, persistSnapshot, unsupportedSnapshotVersion]);
 
   const updateState = useCallback(
     (updater: (current: AppState) => AppState) => {
@@ -332,7 +223,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         throw new Error(
           "Your local library is still loading. Try again shortly.",
         );
-      if (!isValidState(snapshot))
+      if (!isValidAppState(snapshot))
         throw new Error("This cloud backup contains invalid library data.");
       try {
         while (true) {
@@ -424,6 +315,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     () => ({
       state,
       ready,
+      unsupportedSnapshotVersion,
       completeOnboarding,
       updateSettings,
       updateSettingsAndPersist,
@@ -440,6 +332,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [
       state,
       ready,
+      unsupportedSnapshotVersion,
       completeOnboarding,
       updateSettings,
       addWord,
