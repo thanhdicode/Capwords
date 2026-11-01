@@ -12,6 +12,7 @@ import {
   type UploadSource,
 } from "./client";
 import { paginateFiles } from "./serviceCore";
+import { createCloudQuery } from "./cloudQueries";
 import {
   IMAGE_MAX_BYTES,
   SNAPSHOT_MAX_BYTES,
@@ -139,21 +140,11 @@ export class CloudService {
     requireUser(user);
     return (await this.client.account.createJWT()).jwt;
   }
-  private query(method: "limit" | "offset", value: number): string {
-    const { Query } = require(
-      Platform.OS === "web" ? "appwrite" : "react-native-appwrite",
-    );
-    return Query[method](value);
-  }
-
   private async allFiles(): Promise<CloudFile[]> {
-    const { Query } = require(
-      Platform.OS === "web" ? "appwrite" : "react-native-appwrite",
-    );
     return paginateFiles(
       this.client.storage,
       this.config.bucketId,
-      (method, value) => Query[method](value),
+      createCloudQuery,
     );
   }
   async listMedia(): Promise<CloudMediaItem[]> {

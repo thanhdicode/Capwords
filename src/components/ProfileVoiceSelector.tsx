@@ -110,25 +110,29 @@ export function ProfileVoiceSelector({
         />
       </View>
 
-      <View style={styles.footer}>
-        {(previewError || saveError) && (
-          <View accessibilityRole="alert" accessibilityLiveRegion="polite">
-            <Body style={styles.errorText}>
-              {saveError
-                ? PROFILE_COPY.voiceSaveError
-                : PROFILE_COPY.voicePreviewError}
-            </Body>
-          </View>
-        )}
-        <PillButton
-          disabled={loading}
-          onPress={onDone}
-          style={styles.doneButton}
-          textStyle={styles.doneText}
-        >
-          {PROFILE_COPY.voiceDone}
-        </PillButton>
-      </View>
+      {(selectedVoiceId !== null || previewError || saveError) && (
+        <View style={styles.footer}>
+          {(previewError || saveError) && (
+            <View accessibilityRole="alert" accessibilityLiveRegion="polite">
+              <Body style={styles.errorText}>
+                {saveError
+                  ? PROFILE_COPY.voiceSaveError
+                  : PROFILE_COPY.voicePreviewError}
+              </Body>
+            </View>
+          )}
+          {selectedVoiceId !== null && (
+            <PillButton
+              disabled={loading}
+              onPress={onDone}
+              style={styles.doneButton}
+              textStyle={styles.doneText}
+            >
+              {PROFILE_COPY.voiceDone}
+            </PillButton>
+          )}
+        </View>
+      )}
     </>
   );
 }
